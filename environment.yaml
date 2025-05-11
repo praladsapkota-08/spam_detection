@@ -1,4 +1,4 @@
-name: regress
+name: spam
 channels:
   - conda-forge
   - defaults
