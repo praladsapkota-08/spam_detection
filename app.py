@@ -1,34 +1,36 @@
 import streamlit as st
-import numpy as np
-import pandas as pd
 import joblib
-from sklearn.feature_extraction.text import TfidfVectorizer
+import re
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-import nltk
-import re
 
-nltk.download('stopswords')
-stop_words = stopwords.words('english')
-
-file = ".\\model\\support_vector_classifier.joblib"
-model = joblib.load(file)
-
-vectorizer = TfidfVectorizer(max_features = 3000)
+# Load models and resources
+vectorizer = joblib.load('model/vectorizer.joblib')
+model = joblib.load('model/SVC.joblib')
+encoder = joblib.load('model/label_encoder.joblib')
+stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 
-st.title('Spam Detection')
+# Preprocess function (same as your notebook)
+def preprocess_text(text):
+    if not text or not isinstance(text, str):
+        return ''
+    text = re.sub('[^a-zA-Z]', ' ', text).lower().split()
+    text = [word for word in text if word not in stop_words]
+    text = [stemmer.stem(word) for word in text]
+    return ' '.join(text)
 
-st.header('Enter Text')
+# Streamlit app
+st.title("Spam Detection App")
+user_input = st.text_area("Enter a message to check if it's spam or ham:")
 
-
-message = st.text_area("Enter a message", "Type your message here...")
-if st.button("Classify"):
-    if not message.strip():
-        st.error("Please enter a non-empty message.")
-    elif all(word in stop_words for word in message.lower().split()):
-        st.error("Message contains only stop words. Please include meaningful words.")
+if st.button("Predict"):
+    if user_input:
+        # Preprocess and predict
+        processed_text = preprocess_text(user_input)
+        vectorized_text = vectorizer.transform([processed_text]).toarray()
+        prediction = model.predict(vectorized_text)[0]
+        label = encoder.inverse_transform([prediction])[0]
+        st.write(f"Prediction: **{label}**")
     else:
-        # Process the message
-
-        st.write("Processing:", message)
+        st.write("Please enter a message.")
