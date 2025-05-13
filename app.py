@@ -1,8 +1,8 @@
-import streamlit as st
-import joblib
+import streamlit as st# type: ignore
+import joblib# type: ignore
 import re
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
+from nltk.corpus import stopwords # type: ignore
+from nltk.stem import PorterStemmer # type: ignore
 
 # Load models and resources
 vectorizer = joblib.load('model/vectorizer.joblib')
