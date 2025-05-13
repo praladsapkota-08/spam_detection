@@ -3,13 +3,25 @@ import joblib# type: ignore
 import re
 from nltk.corpus import stopwords # type: ignore
 from nltk.stem import PorterStemmer # type: ignore
+import nltk # type: ignore
+
+# Download NLTK stopwords with error handling
+try:
+    nltk.download('stopwords', quiet=True)
+    stop_words = set(stopwords.words('english'))
+except Exception as e:
+    st.error(f"Failed to download NLTK stopwords: {e}")
+    st.stop()
 
 # Load models and resources
-vectorizer = joblib.load('model/vectorizer.joblib')
-model = joblib.load('model/SVC.joblib')
-encoder = joblib.load('model/label_encoder.joblib')
-stop_words = set(stopwords.words('english'))
-stemmer = PorterStemmer()
+try:
+    vectorizer = joblib.load('model/vectorizer.joblib')
+    model = joblib.load('model/MNB.joblib')
+    encoder = joblib.load('model/label_encoder.joblib')
+    stemmer = PorterStemmer()
+except Exception as e:
+    st.error(f"Failed to load model or resources: {e}")
+    st.stop()
 
 # Preprocess function (same as your notebook)
 def preprocess_text(text):
